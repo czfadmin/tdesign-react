@@ -114,12 +114,12 @@ const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>((props,
           }
         }
       } else if (month[0] >= month[1]) {
-          month[1] = dayjs(date).add(1, 'month').month();
-          // 面板联动边界处理
-          if (month[1] === 0) {
-            year[1] = dayjs(date).add(1, 'year').year();
-          }
+        month[1] = dayjs(date).add(1, 'month').month();
+        // 面板联动边界处理
+        if (month[1] === 0) {
+          year[1] = dayjs(date).add(1, 'year').year();
         }
+      }
       setYear([...year]);
       setMonth([...month]);
     }
@@ -172,7 +172,7 @@ const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>((props,
     setMonth(nextMonth);
   }
 
-  // timepicker 点击
+  // time-picker 点击
   function onTimePickerChange(val: string) {
     const nextTimeValue = [...timeValue];
     nextTimeValue[activeIndex] = val;

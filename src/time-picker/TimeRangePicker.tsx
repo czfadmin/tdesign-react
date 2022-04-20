@@ -6,7 +6,7 @@ import { TimeIcon } from 'tdesign-icons-react';
 import useDefaultValue from '../_util/useDefaultValue';
 import useConfig from '../_util/useConfig';
 import { RangeInputPopup } from '../range-input';
-import TimeRangePickerPanel from './panel/TimePickerRangePanel';
+import TimePickerPanel from './panel/TimePickerPanel';
 
 import { useTimePickerTextConfig } from './const';
 
@@ -27,7 +27,7 @@ const TimeRangePicker: FC<TimeRangePickerProps> = (props) => {
     placeholder = TEXT_CONFIG.placeholder,
     size = 'medium',
     steps = [1, 1, 1],
-    value,
+    value = [undefined, undefined],
     onChange,
     // onBlur = noop,
     // onFocus = noop,
@@ -38,6 +38,7 @@ const TimeRangePicker: FC<TimeRangePickerProps> = (props) => {
 
   const { classPrefix } = useConfig();
   const [isPanelShowed, setPanelShow] = useState(false);
+  const [currentPanelIdx, setCurrentPanelIdx] = useState(0);
 
   const name = `${classPrefix}-time-picker`;
 
@@ -52,7 +53,19 @@ const TimeRangePicker: FC<TimeRangePickerProps> = (props) => {
   const handleClear = (context: { e: React.MouseEvent }) => {
     const { e } = context;
     e.stopPropagation();
-    onChange(null);
+    onChange(undefined);
+  };
+
+  const handleClick = ({ position }: { position: 'first' | 'second' }) => {
+    setCurrentPanelIdx(position === 'first' ? 0 : 1);
+  };
+
+  const handleTimeChange = (newValue: string) => {
+    if (currentPanelIdx === 0) {
+      onChange([newValue, value[1] ?? newValue]);
+    } else {
+      onChange([value[0] ?? newValue, newValue]);
+    }
   };
 
   return (
@@ -62,28 +75,31 @@ const TimeRangePicker: FC<TimeRangePickerProps> = (props) => {
         disabled={disabled}
         popupVisible={isPanelShowed}
         onPopupVisibleChange={handleShowPopup}
+        popupProps={{
+          overlayStyle: {
+            width: '280px',
+          },
+        }}
         rangeInputProps={{
+          size,
           clearable,
           className: inputClasses,
           value: value ?? undefined,
           placeholder: !value ? placeholder : undefined,
           suffixIcon: <TimeIcon />,
           onClear: handleClear,
-          // onBlur,
-          // onFocus,
+          onClick: handleClick,
           readonly: !allowInput,
-          size,
         }}
         panel={
-          <TimeRangePickerPanel
+          <TimePickerPanel
             steps={steps}
             format={format}
             hideDisabledTime={hideDisabledTime}
             isFooterDisplay={true}
-            value={value}
-            onChange={onChange}
-            handleConfirmClick={(value) => {
-              onChange(value);
+            value={value[currentPanelIdx || 0]}
+            onChange={handleTimeChange}
+            handleConfirmClick={() => {
               setPanelShow(false);
             }}
           />
